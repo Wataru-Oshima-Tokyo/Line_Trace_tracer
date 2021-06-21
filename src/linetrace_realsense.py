@@ -45,7 +45,7 @@ class Follower:
 		err = cx - w//2 #黄色の先の重心座標(x)と画像の中心(x)との差
 		self.twist.linear.x = 0.2
 		#self.twist.angular.z = -float(err)/100 #画像が大きいためか，-1/100では絶対値がまだ十分に大きく，ロボットが暴れてしまう
-		self.twist.angular.z = -float(err)/1000 #誤差にあわせて回転速度を変化させる（-1/1000がP制御でいうところの比例ゲインにあたる）
+		self.twist.angular.z = -float(err)/2000 #誤差にあわせて回転速度を変化させる（-1/1000がP制御でいうところの比例ゲインにあたる）
 		self.cmd_vel_pub.publish(self.twist)
 
 		#大きすぎるため，サイズ調整

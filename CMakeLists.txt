@@ -121,7 +121,7 @@ include_directories(
 )
 
 #add_executable(line_trace src/linetrace.py)
-catkin_install_python(PROGRAMS src/linetrace.py
+catkin_install_python(PROGRAMS src/linetrace_realsense.py src/linetrace_webcam.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
