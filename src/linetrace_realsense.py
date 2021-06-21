@@ -8,6 +8,26 @@ import cv_bridge
 import numpy as np
 from geometry_msgs.msg import Twist
 
+"""
+M : 与える操作量
+M1 : 一つ前に与えた操作量
+e : 偏差(目的値と現在値の差)
+e1 : 前回の偏差
+e2 : 前々回の偏差
+Kp : 比例制御（P制御)の比例定数
+Ki : 積分制御（I制御)の比例定数
+Kd : 微分制御（D制御)の比例定数
+"""
+
+global M = 0.00 
+global M1 =  0.00   
+global e = 0.00 
+global e1 = 0.00 
+global e2 = 0.00 
+global Kp = 0.1 
+global Ki = 0.1 
+global Kd = 0.1 
+
 class Follower:
 	def __init__(self):
 		print("__init__")
@@ -43,10 +63,10 @@ class Follower:
 			cv.circle(image, (cx, cy), 20, (0, 0, 255), -1) #赤丸を画像に描画
 
 		err = cx - w//2 #黄色の先の重心座標(x)と画像の中心(x)との差
-		self.twist.linear.x = 0.2
-		#self.twist.angular.z = -float(err)/100 #画像が大きいためか，-1/100では絶対値がまだ十分に大きく，ロボットが暴れてしまう
-		self.twist.angular.z = -float(err)/2000 #誤差にあわせて回転速度を変化させる（-1/1000がP制御でいうところの比例ゲインにあたる）
-		self.cmd_vel_pub.publish(self.twist)
+		#self.twist.linear.x = 0.2
+		#self.twist.angular.z = -float(err)/2000 #誤差にあわせて回転速度を変化させる（-1/1000がP制御でいうところの比例ゲインにあたる）
+		#self.cmd_vel_pub.publish(self.twist)
+		self.PIDcontrol(err)
 
 		#大きすぎるため，サイズ調整
 		#print("大きすぎるため，サイズ調整")
@@ -63,6 +83,19 @@ class Follower:
 		cv.waitKey(3)   #3秒待つ
 
 
+	def PIDcontrol(self, goal):
+		t = 100
+		self.twist.linear.x = 0.002
+		global M, M1, e,e1,e2
+			for i in range(t):
+			M1 = M
+			e2 = e1
+			e1 = e
+			M =  M1 + Kp * (e-e1) + Ki * e + Kd * ((e-e1) - (e1-e2))
+
+			self.twist.linear.z = M
+			self.cmd_vel_pub.publish(self.twist)
+		
 #Unnecessary but it will be  used in the future--------------
 
 	def mouseEvent(self,event,x,y,flags,param):
